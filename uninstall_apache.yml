@@ -5,14 +5,14 @@
   tasks:
     - name: Remove Apache package
       dnf:
-        name:
-          - mod_ssl
-          - mod_http2
-          - mod_lua
-          - httpd
-          - "httpd-*"
+        name: httpd
         state: absent
+        autoremove: yes
+      when: ansible_distribution == "Fedora"
 
-    - name: Reload daemon
-      systemd:
-        daemon_reload: yes
+    - name: Remove Apache package
+      apt:
+        name: apache2
+        state: absent
+        autoremove: yes
+      when: ansible_distribution == "Ubuntu"

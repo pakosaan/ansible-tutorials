@@ -3,16 +3,31 @@
   become: yes
 
   tasks:
+    - name: Update repository index
+      dnf:
+        update_cache: yes
+      when: ansible_distribution == "Fedora"
+
     - name: Install Apache
       dnf:
-        name:
-          - httpd
-          - "httpd-*"
-          - mod_ssl
+        name: httpd
         state: present
+      when: ansible_distribution == "Fedora"
 
     - name: Ensure Apache service is started and enabled
-      service:
+      systemd:
         name: httpd
-        state: restarted
-        enabled: true
+        state: started
+        enabled: yes
+      when: ansible_distribution == "Fedora"
+
+    - name: Update repository index
+      apt:
+        update_cache: yes
+      when: ansible_distribution == "Ubuntu"
+
+    - name: Install Apache
+      apt:
+        name: apache2
+        state: present
+      when: ansible_distribution == "Ubuntu"
