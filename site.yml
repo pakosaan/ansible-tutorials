@@ -1,0 +1,80 @@
+---
+- hosts: all
+  become: true
+  tasks:
+    - name: Updating Cache in Fedora
+      dnf:
+        update_only: yes
+        update_cache: yes
+      when: ansible_distribution == "Fedora"
+
+    - name: Updating Cache in Ubuntu
+      apt:
+        upgrade: dist
+        update_cache: yes
+      when: ansible_distribution == "Ubuntu"
+
+- hosts: web_servers
+  become: true
+
+  tasks:
+    - name: Install Apache in Fedora
+      dnf:
+        name: httpd
+        state: latest
+      when: ansible_distribution == "Fedora"
+
+    - name: Starting Apache service in Fedora
+      systemd:
+        name: httpd
+        state: started
+        enabled: yes
+      when: ansible_distribution == "Fedora"
+
+    - name: Install Apache in Ubuntu
+      apt:
+        name: apache2
+        state: latest
+      when: ansible_distribution == "Ubuntu"
+
+- hosts: db_servers
+  become: true
+  tasks:
+    - name: Installing MariaDb in Fedora
+      dnf:
+        name: mariadb-server
+        state: latest
+      when: ansible_distribution == "Fedora"
+
+    - name: Starting Maridb Service in Fedora
+      systemd:
+        name: mariadb
+        state: started
+        enabled: yes
+
+    - name: Installing MariaDb in Ubuntu
+      dnf:
+        name: mariadb-server
+        state: latest
+      when: ansible_distribution == "Ubuntu"
+
+- hosts: file_servers
+  become: true
+  tasks:
+    - name: Installing Samba in Fedora
+      dnf:
+        name: samba
+        state: latest
+      when: ansible_distribution == "Fedora"
+
+    - name: Installing Samabe in Ubuntu
+      apt:
+        name: samba
+        state: latest
+      when: ansible_distribution == "Ubuntu"
+
+    - name: Starting Samba Service in Fedora
+      systemd:
+        name: smb
+        state: started
+        enabled: yes

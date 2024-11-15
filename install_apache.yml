@@ -1,33 +1,25 @@
 ---
 - hosts: all
-  become: yes
+  become: true
 
   tasks:
-    - name: Update repository index
-      dnf:
-        update_cache: yes
-      when: ansible_distribution == "Fedora"
-
-    - name: Install Apache
+    - name: Install Apache in Fedora
       dnf:
         name: httpd
         state: present
+        update_cache: yes
       when: ansible_distribution == "Fedora"
 
-    - name: Ensure Apache service is started and enabled
+    - name: Starting Apache service in Fedora
       systemd:
         name: httpd
         state: started
         enabled: yes
       when: ansible_distribution == "Fedora"
 
-    - name: Update repository index
-      apt:
-        update_cache: yes
-      when: ansible_distribution == "Ubuntu"
-
-    - name: Install Apache
+    - name: Install Apache in ubuntu
       apt:
         name: apache2
         state: present
+        update_cache: yes
       when: ansible_distribution == "Ubuntu"
