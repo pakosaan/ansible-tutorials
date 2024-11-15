@@ -1,0 +1,18 @@
+---
+- hosts: all
+  become: yes
+
+  tasks:
+    - name: Install Apache
+      dnf:
+        name:
+          - httpd
+          - "httpd-*"
+          - mod_ssl
+        state: present
+
+    - name: Ensure Apache service is started and enabled
+      service:
+        name: httpd
+        state: restarted
+        enabled: true

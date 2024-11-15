@@ -1,0 +1,18 @@
+---
+- name: playbook to uninstall httpd
+  hosts: all
+  become: yes
+  tasks:
+    - name: Remove Apache package
+      dnf:
+        name:
+          - mod_ssl
+          - mod_http2
+          - mod_lua
+          - httpd
+          - "httpd-*"
+        state: absent
+
+    - name: Reload daemon
+      systemd:
+        daemon_reload: yes
