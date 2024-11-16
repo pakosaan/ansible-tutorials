@@ -5,16 +5,16 @@
     - name: Updating Cache in Fedora
       tags: always
       dnf:
-        update_only: yes
         update_cache: yes
       when: ansible_distribution == "Fedora"
+      changed_when: false
 
     - name: Updating Cache in Ubuntu
       tags: always
       apt:
-        upgrade: dist
         update_cache: yes
       when: ansible_distribution == "Ubuntu"
+      changed_when: false
 
 - hosts: web_servers
   become: true
@@ -101,6 +101,15 @@
         enabled: yes
       when: ansible_distribution == "Fedora"
 
+- hosts: all
+  become: true
+  tasks:
+    - name: add ssh key for torvald
+      tags: always
+      authorized_key:
+        user: torvald
+        key: "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMKVcsjd6ECGFeQG1jXBQiJsOJSCD3D0bgP6+gSrmBC6 ansible"
+
     - name: Installing unzip
       package:
         name: unzip
@@ -114,3 +123,4 @@
         owner: root
         group: root
         mode: 0755
+        creates: /usr/local/bin/terraform

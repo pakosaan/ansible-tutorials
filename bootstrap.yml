@@ -1,0 +1,42 @@
+---
+- hosts: all
+  become: true
+  pre_tasks:
+    - name: Updating Cache in Fedora
+      tags: always
+      dnf:
+        update_only: yes
+        update_cache: yes
+      when: ansible_distribution == "Fedora"
+
+    - name: Updating Cache in Ubuntu
+      tags: always
+      apt:
+        upgrade: dist
+        update_cache: yes
+      when: ansible_distribution == "Ubuntu"
+
+- hosts: web_servers
+  become: true
+
+- hosts: all
+  become: true
+  tasks:
+    - name: create user torvald
+      tags: always
+      user:
+        name: torvald
+        groups: root
+    - name: add ssh key for torvald
+      tags: always
+      authorized_key:
+        user: torvald
+        key: "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMKVcsjd6ECGFeQG1jXBQiJsOJSCD3D0bgP6+gSrmBC6 ansible"
+    - name: add sudoers file for torvald
+      tags: always
+      copy:
+        src: sudoer_torvald
+        dest: /etc/sudoers.d/
+        owner: root
+        group: root
+        mode: 0440
