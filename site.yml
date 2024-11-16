@@ -51,6 +51,22 @@
         group: root
         mode: 0644
 
+    - name: Chaingin the emal in httpd.conf
+      tags: apache,httpd,fedora
+      lineinfile:
+        path: /etc/httpd/conf/httpd.conf
+        regexp: "^ServerAdmin"
+        line: ServerAdmin vagrant@vagrant
+      register: httpd
+      when: ansible_distribution == "Fedora"
+
+    - name: Restart httpd on file change
+      tags: apache,httpd,fedora
+      systemd:
+        name: httpd
+        state: restarted
+      when: httpd.changed
+
 - hosts: db_servers
   become: true
   tasks:
