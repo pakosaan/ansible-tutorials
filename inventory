@@ -1,10 +1,12 @@
 [web_servers]
-vagrant@192.168.122.4
-vagrant@192.168.122.5
+192.168.122.4
+192.168.122.5
 
 [db_servers]
-vagrant@192.168.122.2
+192.168.122.2
 
 [file_servers]
-vagrant@192.168.122.3
+192.168.122.3
 
+[workstation]
+192.168.122.3
