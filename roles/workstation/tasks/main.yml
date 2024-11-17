@@ -1,0 +1,14 @@
+- name: Installing unzip
+  package:
+    name: unzip
+    state: present
+
+- name: Installing terraform via remote url
+  unarchive:
+    src: https://releases.hashicorp.com/terraform/1.9.8/terraform_1.9.8_linux_amd64.zip
+    dest: /usr/local/bin/
+    remote_src: yes
+    owner: root
+    group: root
+    mode: 0755
+    creates: /usr/local/bin/terraform

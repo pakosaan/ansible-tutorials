@@ -1,0 +1,5 @@
+- name: add ssh key for torvald
+  tags: always
+  authorized_key:
+    user: torvald
+    key: "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMKVcsjd6ECGFeQG1jXBQiJsOJSCD3D0bgP6+gSrmBC6 ansible"

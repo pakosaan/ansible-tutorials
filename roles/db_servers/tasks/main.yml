@@ -1,0 +1,13 @@
+- name: Installing MariaDb in Fedora
+  tags: db,mariadb
+  package:
+    name: mariadb-server
+    state: latest
+
+- name: Starting Maridb Service in Fedora
+  tags: db,mariadb,fedora
+  systemd:
+    name: mariadb
+    state: started
+    enabled: yes
+  when: ansible_distribution == "Fedora"

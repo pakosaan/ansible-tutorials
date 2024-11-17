@@ -1,0 +1,46 @@
+- name: Install Apache in Fedora
+  tags: apache,httpd,fedora
+  dnf:
+    name: httpd
+    state: latest
+  when: ansible_distribution == "Fedora"
+
+- name: Starting Apache service in Fedora
+  tags: apache,httpd,fedora
+  systemd:
+    name: httpd
+    state: started
+    enabled: yes
+  when: ansible_distribution == "Fedora"
+
+- name: Install Apache in Ubuntu
+  tags: apache,apache2,ubuntu
+  apt:
+    name: apache2
+    state: latest
+  when: ansible_distribution == "Ubuntu"
+
+- name: Copying the custom html file
+  tags: apache,apache2,httpd
+  copy:
+    src: default_site.html
+    dest: /var/www/html/index.html
+    owner: root
+    group: root
+    mode: 0644
+
+- name: Chaingin the emal in httpd.conf
+  tags: apache,httpd,fedora
+  lineinfile:
+    path: /etc/httpd/conf/httpd.conf
+    regexp: "^ServerAdmin"
+    line: ServerAdmin vagrant@vagrant
+  register: httpd
+  when: ansible_distribution == "Fedora"
+
+- name: Restart httpd on file change
+  tags: apache,httpd,fedora
+  systemd:
+    name: httpd
+    state: restarted
+  when: httpd.changed

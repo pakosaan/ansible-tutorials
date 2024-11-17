@@ -1,0 +1,13 @@
+- name: Installing Samba
+  tags: samba
+  package:
+    name: samba
+    state: latest
+
+- name: Starting Samba Service in Fedora
+  tags: samba,fedora
+  systemd:
+    name: smb
+    state: started
+    enabled: yes
+  when: ansible_distribution == "Fedora"
