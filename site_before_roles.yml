@@ -1,0 +1,126 @@
+---
+- hosts: all
+  become: true
+  pre_tasks:
+    - name: Updating Cache in Fedora
+      tags: always
+      dnf:
+        update_cache: yes
+      when: ansible_distribution == "Fedora"
+      changed_when: false
+
+    - name: Updating Cache in Ubuntu
+      tags: always
+      apt:
+        update_cache: yes
+      when: ansible_distribution == "Ubuntu"
+      changed_when: false
+
+- hosts: web_servers
+  become: true
+
+  tasks:
+    - name: Install Apache in Fedora
+      tags: apache,httpd,fedora
+      dnf:
+        name: httpd
+        state: latest
+      when: ansible_distribution == "Fedora"
+
+    - name: Starting Apache service in Fedora
+      tags: apache,httpd,fedora
+      systemd:
+        name: httpd
+        state: started
+        enabled: yes
+      when: ansible_distribution == "Fedora"
+
+    - name: Install Apache in Ubuntu
+      tags: apache,apache2,ubuntu
+      apt:
+        name: apache2
+        state: latest
+      when: ansible_distribution == "Ubuntu"
+
+    - name: Copying the custom html file
+      tags: apache,apache2,httpd
+      copy:
+        src: default_site.html
+        dest: /var/www/html/index.html
+        owner: root
+        group: root
+        mode: 0644
+
+    - name: Chaingin the emal in httpd.conf
+      tags: apache,httpd,fedora
+      lineinfile:
+        path: /etc/httpd/conf/httpd.conf
+        regexp: "^ServerAdmin"
+        line: ServerAdmin vagrant@vagrant
+      register: httpd
+      when: ansible_distribution == "Fedora"
+
+    - name: Restart httpd on file change
+      tags: apache,httpd,fedora
+      systemd:
+        name: httpd
+        state: restarted
+      when: httpd.changed
+
+- hosts: db_servers
+  become: true
+  tasks:
+    - name: Installing MariaDb in Fedora
+      tags: db,mariadb
+      package:
+        name: mariadb-server
+        state: latest
+
+    - name: Starting Maridb Service in Fedora
+      tags: db,mariadb,fedora
+      systemd:
+        name: mariadb
+        state: started
+        enabled: yes
+      when: ansible_distribution == "Fedora"
+
+- hosts: file_servers
+  become: true
+  tasks:
+    - name: Installing Samba
+      tags: samba
+      package:
+        name: samba
+        state: latest
+
+    - name: Starting Samba Service in Fedora
+      tags: samba,fedora
+      systemd:
+        name: smb
+        state: started
+        enabled: yes
+      when: ansible_distribution == "Fedora"
+
+- hosts: all
+  become: true
+  tasks:
+    - name: add ssh key for torvald
+      tags: always
+      authorized_key:
+        user: torvald
+        key: "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMKVcsjd6ECGFeQG1jXBQiJsOJSCD3D0bgP6+gSrmBC6 ansible"
+
+    - name: Installing unzip
+      package:
+        name: unzip
+        state: present
+
+    - name: Installing terraform via remote url
+      unarchive:
+        src: https://releases.hashicorp.com/terraform/1.9.8/terraform_1.9.8_linux_amd64.zip
+        dest: /usr/local/bin/
+        remote_src: yes
+        owner: root
+        group: root
+        mode: 0755
+        creates: /usr/local/bin/terraform
