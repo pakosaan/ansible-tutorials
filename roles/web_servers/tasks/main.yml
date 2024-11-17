@@ -1,14 +1,14 @@
 - name: Install Apache in Fedora
   tags: apache,httpd,fedora
   dnf:
-    name: httpd
+    name: "{{apache_package}}"
     state: latest
   when: ansible_distribution == "Fedora"
 
 - name: Starting Apache service in Fedora
   tags: apache,httpd,fedora
   systemd:
-    name: httpd
+    name: "{{apache_service}}"
     state: started
     enabled: yes
   when: ansible_distribution == "Fedora"
@@ -16,7 +16,7 @@
 - name: Install Apache in Ubuntu
   tags: apache,apache2,ubuntu
   apt:
-    name: apache2
+    name: "{{apache_package}}"
     state: latest
   when: ansible_distribution == "Ubuntu"
 
@@ -34,13 +34,6 @@
   lineinfile:
     path: /etc/httpd/conf/httpd.conf
     regexp: "^ServerAdmin"
-    line: ServerAdmin vagrant@vagrant
-  register: httpd
+    line: ServerAdmin linus@torvald
+  notify: restart_apache
   when: ansible_distribution == "Fedora"
-
-- name: Restart httpd on file change
-  tags: apache,httpd,fedora
-  systemd:
-    name: httpd
-    state: restarted
-  when: httpd.changed
